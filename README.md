@@ -1,5 +1,7 @@
 # Vehicle Damage Detection
 
+[![Tests](https://github.com/oyetzmedic/vehicle-damage-detection/actions/workflows/tests.yml/badge.svg)](https://github.com/oyetzmedic/vehicle-damage-detection/actions/workflows/tests.yml)
+
 PyTorch object-detection project for identifying visible vehicle damage in photographs.
 
 **Status:** build in progress. Training and evaluation results will be added only after they are produced and verified.
@@ -27,11 +29,11 @@ Source: **Damage-on-cars** by **brigada4** on Roboflow Universe.
 
 This repository does **not** commit the dataset images. See `DATASET_LICENSE.md` and `scripts/download_data.py`.
 
-The preparation step keeps the four target classes and uses deterministic sampling/splitting with seed 42.
+The preparation step keeps the four target classes, caps the working set at up to 900 eligible images, uses seed 42 for deterministic sampling, and preserves the source train/validation/test membership.
 
 ## Model
 
-The detector uses `torchvision.models.detection.fasterrcnn_resnet50_fpn` with COCO-pretrained weights and a replaced ROI classifier head for the project classes plus background.
+The detector uses `torchvision.models.detection.fasterrcnn_resnet50_fpn` with COCO-pretrained weights and a replaced ROI classifier head for the four project classes plus background.
 
 ## OpenCV
 
@@ -51,9 +53,9 @@ The held-out test split will report:
 - overall mAP
 - per-class AP
 - confidence-threshold sweep
-- number and percentage of detections routed to manual review
+- number and percentage of candidate detections routed to manual review
 
-mAP measures detector quality across ranked confidence scores. The threshold sweep is reported separately as an operational human-review policy.
+mAP measures detector quality across ranked confidence scores. The confidence-threshold sweep is reported separately as an operational human-review policy.
 
 ## Repository layout
 
@@ -68,22 +70,60 @@ vehicle-damage-detection/
 │   └── visualize.py
 ├── scripts/
 │   ├── download_data.py
+│   ├── prepare_data.py
+│   ├── train.py
+│   ├── evaluate.py
 │   └── infer_folder.py
-├── tests/
+├── tests/test_utils.py
 ├── DATASET_LICENSE.md
 ├── LICENSE
 ├── requirements.txt
+├── requirements-test.txt
+├── pytest.ini
 └── README.md
 ```
 
-## Development
+## Setup
 
 ```bash
 python -m pip install -r requirements.txt
-python -m pytest -q
 ```
 
-Training commands and verified evaluation numbers will be documented after the first reproducible run.
+Set your Roboflow API key in the environment, then download and prepare the data:
+
+```bash
+python scripts/download_data.py
+python scripts/prepare_data.py --max-images 900 --seed 42
+```
+
+Train the detector:
+
+```bash
+python scripts/train.py --epochs 5 --batch-size 2
+```
+
+Evaluate the held-out test split:
+
+```bash
+python scripts/evaluate.py
+```
+
+Run folder inference and write annotated images:
+
+```bash
+python scripts/infer_folder.py path/to/images --threshold 0.5
+```
+
+Run the hermetic utility tests:
+
+```bash
+python -m pip install -r requirements-test.txt
+python -m pytest
+```
+
+## Results
+
+Evaluation numbers are intentionally not reported yet. This section will be updated only after a reproducible fine-tuning run and held-out evaluation.
 
 ## Limitations
 
