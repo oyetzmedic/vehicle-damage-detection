@@ -42,6 +42,8 @@ def main() -> None:
     )
 
     model = build_model(device=device, pretrained=True)
+    amp_enabled = device.type == "cuda"
+    scaler = torch.amp.GradScaler("cuda", enabled=amp_enabled)
     params = [parameter for parameter in model.parameters() if parameter.requires_grad]
     optimizer = torch.optim.SGD(
         params, lr=args.lr, momentum=0.9, weight_decay=0.0005
@@ -57,12 +59,14 @@ def main() -> None:
                 for target in targets
             ]
 
-            losses = model(images, targets)
-            loss = sum(loss_value for loss_value in losses.values())
-
             optimizer.zero_grad(set_to_none=True)
-            loss.backward()
-            optimizer.step()
+            with torch.amp.autocast(device_type=device.type, enabled=amp_enabled):
+                losses = model(images, targets)
+                loss = sum(loss_value for loss_value in losses.values())
+
+            scaler.scale(loss).backward()
+            scaler.step(optimizer)
+            scaler.update()
             running_loss += float(loss.detach().cpu())
 
         mean_loss = running_loss / max(1, len(loader))

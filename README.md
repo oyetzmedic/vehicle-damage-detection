@@ -35,7 +35,7 @@ The preparation step keeps the four target classes, caps the working set at up t
 
 The detector uses `torchvision.models.detection.fasterrcnn_resnet50_fpn` with COCO-pretrained weights and a replaced ROI classifier head for the four project classes plus background.
 
-For the reference development machine, the model uses a low-memory image transform of **512 px minimum / 768 px maximum** and a default **batch size of 1** so Faster R-CNN can train on a 4 GB GTX 1050 Ti.
+For the reference development machine, the model uses a low-memory image transform of **384 px minimum / 640 px maximum**, reduced RPN proposal counts, mixed-precision CUDA training, and a default **batch size of 1** so Faster R-CNN can train on a 4 GB GTX 1050 Ti.
 
 ## OpenCV
 

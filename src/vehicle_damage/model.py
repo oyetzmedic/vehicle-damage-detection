@@ -27,8 +27,8 @@ def _set_trainable_backbone_layers(model: FasterRCNN, trainable_layers: int) -> 
 def build_model(
     num_damage_classes: int = len(TARGET_CLASSES),
     trainable_backbone_layers: int = 3,
-    min_size: int = 512,
-    max_size: int = 768,
+    min_size: int = 384,
+    max_size: int = 640,
     device: torch.device | str = "cpu",
     pretrained: bool = True,
 ):
@@ -56,6 +56,11 @@ def build_model(
         num_classes=initial_classes,
         min_size=min_size,
         max_size=max_size,
+        rpn_pre_nms_top_n_train=600,
+        rpn_pre_nms_top_n_test=300,
+        rpn_post_nms_top_n_train=300,
+        rpn_post_nms_top_n_test=150,
+        box_detections_per_img=50,
     ).to(device)
 
     if pretrained:
