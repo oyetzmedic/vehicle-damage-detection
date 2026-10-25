@@ -83,6 +83,7 @@ vehicle-damage-detection/
 ├── requirements.txt
 ├── requirements-test.txt
 ├── pytest.ini
+├── pyproject.toml
 └── README.md
 ```
 
@@ -93,6 +94,7 @@ The reference Windows/CUDA environment uses PyTorch 2.5.1 and torchvision 0.20.1
 ```bash
 python -m pip install -r requirements-torch-cu121.txt
 python -m pip install -r requirements.txt
+python -m pip install -e .
 ```
 
 The CUDA-specific file is separate so the non-PyTorch dependencies can also be installed independently on other machines.
