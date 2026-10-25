@@ -17,7 +17,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--data-dir", type=Path, default=Path("data/processed"))
     parser.add_argument("--epochs", type=int, default=5)
-    parser.add_argument("--batch-size", type=int, default=2)
+    parser.add_argument("--batch-size", type=int, default=1)
     parser.add_argument("--lr", type=float, default=0.005)
     parser.add_argument("--output", type=Path, default=Path("checkpoints/fasterrcnn.pt"))
     parser.add_argument("--seed", type=int, default=42)

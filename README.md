@@ -35,6 +35,8 @@ The preparation step keeps the four target classes, caps the working set at up t
 
 The detector uses `torchvision.models.detection.fasterrcnn_resnet50_fpn` with COCO-pretrained weights and a replaced ROI classifier head for the four project classes plus background.
 
+For the reference development machine, the model uses a low-memory image transform of **512 px minimum / 768 px maximum** and a default **batch size of 1** so Faster R-CNN can train on a 4 GB GTX 1050 Ti.
+
 ## OpenCV
 
 OpenCV is used for:
@@ -77,6 +79,7 @@ vehicle-damage-detection/
 ├── tests/test_utils.py
 ├── DATASET_LICENSE.md
 ├── LICENSE
+├── requirements-torch-cu121.txt
 ├── requirements.txt
 ├── requirements-test.txt
 ├── pytest.ini
@@ -85,9 +88,14 @@ vehicle-damage-detection/
 
 ## Setup
 
+The reference Windows/CUDA environment uses PyTorch 2.5.1 and torchvision 0.20.1 with CUDA 12.1:
+
 ```bash
+python -m pip install -r requirements-torch-cu121.txt
 python -m pip install -r requirements.txt
 ```
+
+The CUDA-specific file is separate so the non-PyTorch dependencies can also be installed independently on other machines.
 
 Set your Roboflow API key in the environment, then download and prepare the data:
 
@@ -99,7 +107,7 @@ python scripts/prepare_data.py --max-images 900 --seed 42
 Train the detector:
 
 ```bash
-python scripts/train.py --epochs 5 --batch-size 2
+python scripts/train.py --epochs 5 --batch-size 1
 ```
 
 Evaluate the held-out test split:
