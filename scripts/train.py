@@ -41,7 +41,7 @@ def main() -> None:
         collate_fn=collate_fn,
     )
 
-    model = build_model().to(device)
+    model = build_model(device=device, pretrained=True)
     params = [parameter for parameter in model.parameters() if parameter.requires_grad]
     optimizer = torch.optim.SGD(
         params, lr=args.lr, momentum=0.9, weight_decay=0.0005

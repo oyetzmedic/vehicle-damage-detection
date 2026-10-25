@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import torch
 from torchvision.models.detection import FasterRCNN_ResNet50_FPN_Weights
 from torchvision.models.detection.backbone_utils import resnet_fpn_backbone
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor, FasterRCNN
@@ -28,16 +29,16 @@ def build_model(
     trainable_backbone_layers: int = 3,
     min_size: int = 512,
     max_size: int = 768,
+    device: torch.device | str = "cpu",
+    pretrained: bool = True,
 ):
-    """Build a COCO-pretrained Faster R-CNN with a new classifier head.
+    """Build Faster R-CNN using a low-memory weight-loading path.
 
-    The model is assembled explicitly before loading the official torchvision
-    COCO state dict. This avoids a Windows access violation observed on the
-    reference machine in the convenience pretrained-weight constructor while
-    preserving the pretrained detector weights and FrozenBatchNorm backbone.
-
-    The default 512-768 px transform is a low-memory profile for 4 GB GPUs.
+    The pretrained path moves the model to the target device first and maps
+    the official COCO checkpoint directly to that device. Evaluation and
+    inference can set pretrained=False and load only the project checkpoint.
     """
+    device = torch.device(device)
     weights = FasterRCNN_ResNet50_FPN_Weights.DEFAULT
 
     backbone = resnet_fpn_backbone(
@@ -46,19 +47,30 @@ def build_model(
         norm_layer=FrozenBatchNorm2d,
         trainable_layers=5,
     )
+
+    initial_classes = (
+        len(weights.meta["categories"]) if pretrained else num_damage_classes + 1
+    )
     model = FasterRCNN(
         backbone,
-        num_classes=len(weights.meta["categories"]),
+        num_classes=initial_classes,
         min_size=min_size,
         max_size=max_size,
-    )
-    model.load_state_dict(
-        weights.get_state_dict(progress=False, check_hash=True)
-    )
-    _set_trainable_backbone_layers(model, trainable_backbone_layers)
+    ).to(device)
 
-    in_features = model.roi_heads.box_predictor.cls_score.in_features
-    model.roi_heads.box_predictor = FastRCNNPredictor(
-        in_features, num_damage_classes + 1
-    )
+    if pretrained:
+        state_dict = weights.get_state_dict(
+            progress=False,
+            check_hash=True,
+            map_location=device,
+        )
+        model.load_state_dict(state_dict)
+        del state_dict
+
+        in_features = model.roi_heads.box_predictor.cls_score.in_features
+        model.roi_heads.box_predictor = FastRCNNPredictor(
+            in_features, num_damage_classes + 1
+        ).to(device)
+
+    _set_trainable_backbone_layers(model, trainable_backbone_layers)
     return model

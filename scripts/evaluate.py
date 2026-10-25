@@ -32,11 +32,11 @@ def main() -> None:
     dataset = CocoDamageDataset(args.data_dir / "test", augment=False)
     loader = DataLoader(dataset, batch_size=1, shuffle=False, collate_fn=collate_fn)
 
-    model = build_model()
-    checkpoint = torch.load(args.checkpoint, map_location="cpu")
+    model = build_model(device=device, pretrained=False)
+    checkpoint = torch.load(args.checkpoint, map_location=device)
     state_dict = checkpoint.get("model_state_dict", checkpoint)
     model.load_state_dict(state_dict)
-    model.to(device).eval()
+    model.eval()
 
     metric = MeanAveragePrecision(
         box_format="xyxy",
