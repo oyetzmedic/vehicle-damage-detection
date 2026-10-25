@@ -41,6 +41,14 @@ def build_model(
     device = torch.device(device)
     weights = FasterRCNN_ResNet50_FPN_Weights.DEFAULT
 
+    state_dict = None
+    if pretrained:
+        state_dict = weights.get_state_dict(
+            progress=False,
+            check_hash=True,
+            map_location=device,
+        )
+
     backbone = resnet_fpn_backbone(
         backbone_name="resnet50",
         weights=None,
@@ -64,11 +72,6 @@ def build_model(
     ).to(device)
 
     if pretrained:
-        state_dict = weights.get_state_dict(
-            progress=False,
-            check_hash=True,
-            map_location=device,
-        )
         model.load_state_dict(state_dict)
         del state_dict
 
