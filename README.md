@@ -30,7 +30,7 @@ Source: **Damage-on-cars** by **brigada4** on Roboflow Universe.
 - Licence: CC BY 4.0
 - Project URL: https://universe.roboflow.com/brigada4/damage-on-cars
 
-This repository does **not** commit the dataset images. See `DATASET_LICENSE.md` and `scripts/download_data.py`.
+This repository does **not** commit the raw dataset. It includes four annotated derivative images under `docs/portfolio/` for portfolio demonstration. Those examples originate from the CC BY 4.0 dataset and were modified by adding model predictions, labels, confidence values and/or diagnostic overlays. See `DATASET_LICENSE.md` for attribution.
 
 After filtering to images containing at least one of the four project classes, the working dataset contains **683 images** and **1,815 target annotations**:
 
@@ -95,6 +95,31 @@ The selected epoch-5 checkpoint was evaluated once on the 66-image held-out test
 The strongest class is Broken Glass. Crack remains the weakest class, consistent with its small number of training and evaluation examples.
 
 Exact metric outputs are retained under `results/`.
+
+
+## Example detections
+
+These examples come from the held-out test split and are shown for qualitative inspection. They are not additional evaluation samples beyond the reported test set.
+
+<table>
+<tr>
+<td align="center"><strong>Broken Glass</strong><br><img src="docs/portfolio/broken_glass_success.jpg" width="240"><br>Correct detection, confidence 0.93</td>
+<td align="center"><strong>Dent</strong><br><img src="docs/portfolio/dent_success.jpg" width="240"><br>Correct detection, confidence 0.88</td>
+<td align="center"><strong>Scratch</strong><br><img src="docs/portfolio/scratch_success.jpg" width="240"><br>Two correctly matched detections</td>
+</tr>
+</table>
+
+### Crack failure analysis
+
+Crack was the weakest class on the held-out test set. Of 8 Crack ground-truth objects, 6 had a prediction of any class overlapping at IoU >= 0.5, while 3 had a Crack-class prediction overlapping at IoU >= 0.5. The main issue was therefore often class confidence or confusion with visually similar damage rather than localization alone.
+
+<p align="center">
+  <img src="docs/portfolio/crack_diagnostic_clean.jpg" width="520">
+</p>
+
+In the diagnostic case above, the Crack prediction overlaps the ground truth at **IoU 0.813** but has only **0.062 confidence**, illustrating strong localization with weak class confidence.
+
+The four images in this section are modified derivatives of the **Damage-on-cars** dataset by **brigada4**, licensed under **CC BY 4.0**. Modifications include model-prediction boxes, labels, confidence values and diagnostic overlays. Source: https://universe.roboflow.com/brigada4/damage-on-cars. Licence: https://creativecommons.org/licenses/by/4.0/.
 
 ## Human-review threshold analysis
 
