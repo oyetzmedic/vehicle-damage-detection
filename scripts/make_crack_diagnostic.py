@@ -13,25 +13,18 @@ from vehicle_damage.dataset import CocoDamageDataset
 from vehicle_damage.model import build_model
 
 
+GT_COLOR = (0, 200, 0)
+PRED_COLOR = (0, 165, 255)
+
+
 def draw_box(
     image: np.ndarray,
     box: torch.Tensor,
-    label: str,
+    color: tuple[int, int, int],
     thickness: int = 2,
 ) -> None:
     x1, y1, x2, y2 = [int(round(float(value))) for value in box]
-    cv2.rectangle(image, (x1, y1), (x2, y2), (255, 255, 255), thickness)
-    y_text = max(18, y1 - 8)
-    cv2.putText(
-        image,
-        label,
-        (x1, y_text),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        0.55,
-        (255, 255, 255),
-        2,
-        cv2.LINE_AA,
-    )
+    cv2.rectangle(image, (x1, y1), (x2, y2), color, thickness)
 
 
 def main() -> None:
@@ -127,37 +120,63 @@ def main() -> None:
     if image is None:
         raise FileNotFoundError(image_path)
 
-    draw_box(image, best_gt, "Ground truth: Crack", thickness=3)
-    draw_box(
-        image,
-        best_pred,
-        f"Prediction: Crack  conf={best_score:.3f}  IoU={best_iou:.3f}",
-        thickness=2,
+    draw_box(image, best_gt, GT_COLOR, thickness=3)
+    draw_box(image, best_pred, PRED_COLOR, thickness=2)
+
+    width = image.shape[1]
+    header = np.zeros((104, width, 3), dtype=np.uint8)
+    footer = np.zeros((42, width, 3), dtype=np.uint8)
+
+    cv2.putText(
+        header,
+        "Crack failure analysis",
+        (10, 24),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.62,
+        (255, 255, 255),
+        2,
+        cv2.LINE_AA,
     )
 
-    footer = (
-        "Failure analysis: localization is strong, but class confidence is low."
-    )
-    cv2.rectangle(
-        image,
-        (0, max(0, image.shape[0] - 34)),
-        (image.shape[1], image.shape[0]),
-        (0, 0, 0),
-        -1,
-    )
+    cv2.rectangle(header, (10, 39), (30, 55), GT_COLOR, -1)
     cv2.putText(
-        image,
-        footer,
-        (8, image.shape[0] - 11),
+        header,
+        "Ground truth: Crack",
+        (40, 53),
         cv2.FONT_HERSHEY_SIMPLEX,
-        0.42,
+        0.46,
         (255, 255, 255),
         1,
         cv2.LINE_AA,
     )
 
+    cv2.rectangle(header, (10, 67), (30, 83), PRED_COLOR, -1)
+    cv2.putText(
+        header,
+        f"Prediction: Crack | confidence={best_score:.3f} | IoU={best_iou:.3f}",
+        (40, 81),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.43,
+        (255, 255, 255),
+        1,
+        cv2.LINE_AA,
+    )
+
+    cv2.putText(
+        footer,
+        "Localization is strong, but class confidence is low.",
+        (10, 27),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.43,
+        (255, 255, 255),
+        1,
+        cv2.LINE_AA,
+    )
+
+    canvas = np.vstack([header, image, footer])
+
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    if not cv2.imwrite(str(args.output), image):
+    if not cv2.imwrite(str(args.output), canvas):
         raise RuntimeError(f"Failed to write {args.output}")
 
     print(f"filename={args.filename}")
