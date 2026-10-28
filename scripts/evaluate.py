@@ -23,13 +23,14 @@ def scalar(value):
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--data-dir", type=Path, default=Path("data/processed"))
+    parser.add_argument("--split", choices=("valid", "test"), default="test")
     parser.add_argument("--checkpoint", type=Path, default=Path("checkpoints/fasterrcnn.pt"))
     parser.add_argument("--output", type=Path, default=Path("results/metrics.json"))
     parser.add_argument("--candidate-floor", type=float, default=0.05)
     args = parser.parse_args()
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    dataset = CocoDamageDataset(args.data_dir / "test", augment=False)
+    dataset = CocoDamageDataset(args.data_dir / args.split, augment=False)
     loader = DataLoader(dataset, batch_size=1, shuffle=False, collate_fn=collate_fn)
 
     model = build_model(device=device, pretrained=False)
@@ -69,6 +70,7 @@ def main() -> None:
 
     raw = metric.compute()
     result = {
+        "split": args.split,
         "map": scalar(raw["map"]),
         "map_50": scalar(raw["map_50"]),
         "map_75": scalar(raw["map_75"]),
