@@ -9,5 +9,49 @@
     "Dent": 0.034023940563201904,
     "Broken Glass": 0.11527305841445923
   },
-  "candidate_floor": 0.05
+  "candidate_floor": 0.05,
+  "threshold_sweep": [
+    {
+      "threshold": 0.3,
+      "candidate_detections": 1497,
+      "needs_review": 1429,
+      "auto_accept": 68,
+      "review_rate": 0.9545758183032732
+    },
+    {
+      "threshold": 0.4,
+      "candidate_detections": 1497,
+      "needs_review": 1463,
+      "auto_accept": 34,
+      "review_rate": 0.9772879091516367
+    },
+    {
+      "threshold": 0.5,
+      "candidate_detections": 1497,
+      "needs_review": 1483,
+      "auto_accept": 14,
+      "review_rate": 0.9906479625918504
+    },
+    {
+      "threshold": 0.6,
+      "candidate_detections": 1497,
+      "needs_review": 1487,
+      "auto_accept": 10,
+      "review_rate": 0.9933199732798931
+    },
+    {
+      "threshold": 0.7,
+      "candidate_detections": 1497,
+      "needs_review": 1495,
+      "auto_accept": 2,
+      "review_rate": 0.9986639946559787
+    },
+    {
+      "threshold": 0.8,
+      "candidate_detections": 1497,
+      "needs_review": 1497,
+      "auto_accept": 0,
+      "review_rate": 1.0
+    }
+  ]
 }
