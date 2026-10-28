@@ -1,0 +1,21 @@
+{
+  "split": "test",
+  "map": 0.10385112464427948,
+  "map_50": 0.2727140188217163,
+  "map_75": 0.06640619039535522,
+  "per_class_ap": {
+    "Crack": 0.027557754889130592,
+    "Scratch": 0.056546494364738464,
+    "Dent": 0.06696600466966629,
+    "Broken Glass": 0.2643342614173889
+  },
+  "candidate_floor": 0.05,
+  "threshold_sweep": [
+    {"threshold": 0.3, "candidate_detections": 787, "needs_review": 652, "auto_accept": 135, "review_rate": 0.8284625158831004},
+    {"threshold": 0.4, "candidate_detections": 787, "needs_review": 692, "auto_accept": 95, "review_rate": 0.8792884371029225},
+    {"threshold": 0.5, "candidate_detections": 787, "needs_review": 722, "auto_accept": 65, "review_rate": 0.9174078780177891},
+    {"threshold": 0.6, "candidate_detections": 787, "needs_review": 745, "auto_accept": 42, "review_rate": 0.9466327827191868},
+    {"threshold": 0.7, "candidate_detections": 787, "needs_review": 765, "auto_accept": 22, "review_rate": 0.9720457433290979},
+    {"threshold": 0.8, "candidate_detections": 787, "needs_review": 779, "auto_accept": 8, "review_rate": 0.9898348157560356}
+  ]
+}
